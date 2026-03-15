@@ -29,8 +29,11 @@ class Ui_MainWindow(object):
                 #Select button
                 self.select_button = QtWidgets.QPushButton(self.centralwidget)
                 self.select_button.setGeometry(QtCore.QRect(1030, 320, 331, 51))
-                font = QtGui.QFont()
-                font.setFamily("DB Lim X")
+                font_dir = os.path.join(os.path.dirname(__file__), 'fonts')
+                font_path = os.path.join(font_dir, 'DBLimX.ttf')
+                if os.path.exists(font_path):
+                        QtGui.QFontDatabase.addApplicationFont(font_path)
+                font = QtGui.QFont("DB Lim X")
                 font.setPointSize(24)
                 self.select_button.setFont(font)
                 self.select_button.setStyleSheet("color: rgb(200, 200, 200);\n"
@@ -74,7 +77,8 @@ class Ui_MainWindow(object):
                 self.logo = QtWidgets.QLabel(self.centralwidget)
                 self.logo.setGeometry(QtCore.QRect(1070, 50, 241, 241))
                 self.logo.setText("")
-                self.logo.setPixmap(QtGui.QPixmap("/src/logo/Logo.png"))
+                logo_path = os.path.join(os.path.dirname(__file__), 'src', 'logo', 'Logo.png')
+                self.logo.setPixmap(QtGui.QPixmap(logo_path))
                 self.logo.setScaledContents(True)
                 self.logo.setObjectName("logo")
                 
