@@ -13,7 +13,7 @@ The WYVERN application uses deep learning models to analyze chest X-ray images. 
 
 The models in `src/models` are used to perform the image analysis, ensuring accurate and fast inspection. The GUI makes it easy for users to operate without needing to write code.
 
-![alt text](src/logo/demo.png)
+![alt text](logo/demo.png)
 
 ## 🚀 How to Run
 
