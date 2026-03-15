@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         def retranslateUi(self, MainWindow):
                 _translate = QtCore.QCoreApplication.translate
                 MainWindow.setWindowTitle(_translate("MainWindow", "WYVERN v2026"))
-                self.select_button.setText(_translate("MainWindow", "Select Img"))
+                self.select_button.setText(_translate("MainWindow", "Select Image"))
                 self.analyze_button.setText(_translate("MainWindow", "Analyze"))
                 self.clear_button.setText(_translate("MainWindow", "Clear"))
                 self.img.setText(_translate("MainWindow", "Please choose image"))
