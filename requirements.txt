@@ -1,0 +1,9 @@
+torch
+PyQt5
+timm
+cv2
+numpy
+segmentation_models_pytorch
+skimage
+matplotlib
+pydicom
