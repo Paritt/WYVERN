@@ -1,2 +1,4 @@
 # Ignore model checkpoint files
 *.pth
+# Ignore macOS system files
+.DS_Store
