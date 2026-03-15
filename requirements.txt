@@ -3,7 +3,8 @@ PyQt5
 timm
 cv2
 numpy
-segmentation_models_pytorch
+segmentation_models_pytorch==0.3.1
 skimage
 matplotlib
 pydicom
+timm==1.0.25

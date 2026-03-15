@@ -17,7 +17,7 @@ class Ui_MainWindow(object):
                 MainWindow.setObjectName("MainWindow")
                 MainWindow.resize(1440, 872)
                 icon = QtGui.QIcon()
-                icon.addPixmap(QtGui.QPixmap("src/logo/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                icon.addPixmap(QtGui.QPixmap("/src/logo/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
                 MainWindow.setWindowIcon(icon)
                 MainWindow.setAutoFillBackground(False)
                 MainWindow.setStyleSheet("background-color: rgb(0, 0, 0);")
@@ -72,7 +72,7 @@ class Ui_MainWindow(object):
                 self.logo = QtWidgets.QLabel(self.centralwidget)
                 self.logo.setGeometry(QtCore.QRect(1070, 50, 241, 241))
                 self.logo.setText("")
-                self.logo.setPixmap(QtGui.QPixmap("src/logo/Logo.png"))
+                self.logo.setPixmap(QtGui.QPixmap("/src/logo/Logo.png"))
                 self.logo.setScaledContents(True)
                 self.logo.setObjectName("logo")
                 
