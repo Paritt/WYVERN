@@ -16,8 +16,10 @@ class Ui_MainWindow(object):
         def setupUi(self, MainWindow):
                 MainWindow.setObjectName("MainWindow")
                 MainWindow.resize(1440, 872)
+                import os
                 icon = QtGui.QIcon()
-                icon.addPixmap(QtGui.QPixmap("/src/logo/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                icon_path = os.path.join(os.path.dirname(__file__), 'src', 'logo', 'icon.png')
+                icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
                 MainWindow.setWindowIcon(icon)
                 MainWindow.setAutoFillBackground(False)
                 MainWindow.setStyleSheet("background-color: rgb(0, 0, 0);")
