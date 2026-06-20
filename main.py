@@ -15,8 +15,30 @@ from pydicom import dcmread
 class Ui_MainWindow(object):
         def setupUi(self, MainWindow):
                 MainWindow.setObjectName("MainWindow")
-                MainWindow.resize(1440, 872)
                 import os
+
+                # --- dynamic scaling based on actual screen size ---
+                screen_geo = QtWidgets.QApplication.primaryScreen().availableGeometry()
+                SW, SH = screen_geo.width(), screen_geo.height()
+                BASE_W, BASE_H = 1440, 872
+                sw, sh = SW / BASE_W, SH / BASE_H
+                sf = min(sw, sh)  # uniform font scale
+
+                def r(x, y, w, h):
+                        return QtCore.QRect(int(x * sw), int(y * sh), int(w * sw), int(h * sh))
+
+                def fs(size):
+                        return max(8, int(size * sf))
+
+                def font_arial(size, bold=False):
+                        f = QtGui.QFont("Arial")
+                        f.setPointSize(fs(size))
+                        if bold:
+                                f.setBold(True)
+                                f.setWeight(75)
+                        return f
+                # ---------------------------------------------------
+
                 icon = QtGui.QIcon()
                 icon_path = os.path.join(os.path.dirname(__file__), 'src', 'logo', 'icon.png')
                 icon.addPixmap(QtGui.QPixmap(icon_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -25,212 +47,168 @@ class Ui_MainWindow(object):
                 MainWindow.setStyleSheet("background-color: rgb(0, 0, 0);")
                 self.centralwidget = QtWidgets.QWidget(MainWindow)
                 self.centralwidget.setObjectName("centralwidget")
-                
+
                 #Select button
                 self.select_button = QtWidgets.QPushButton(self.centralwidget)
-                self.select_button.setGeometry(QtCore.QRect(1030, 320, 331, 51))
-                font = QtGui.QFont("Arial")
-                font.setPointSize(20)
-                self.select_button.setFont(font)
+                self.select_button.setGeometry(r(1030, 320, 331, 56))
+                self.select_button.setFont(font_arial(20))
                 self.select_button.setStyleSheet("color: rgb(200, 200, 200);\n"
         "background-color: rgba(245, 245, 245, 51);")
                 self.select_button.setObjectName("select_button")
-                self.analyze_button = QtWidgets.QPushButton(self.centralwidget)
-                self.analyze_button.setGeometry(QtCore.QRect(1030, 380, 331, 51))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(20)
-                
+
                 #Analyze button
-                self.analyze_button.setFont(font)
+                self.analyze_button = QtWidgets.QPushButton(self.centralwidget)
+                self.analyze_button.setGeometry(r(1030, 390, 331, 56))
+                self.analyze_button.setFont(font_arial(20))
                 self.analyze_button.setStyleSheet("background-color: rgba(245, 245, 245, 51);\n"
         "color: rgb(200, 200, 200);")
                 self.analyze_button.setObjectName("analyze_button")
-                
+
                 #Clear button
                 self.clear_button = QtWidgets.QPushButton(self.centralwidget)
-                self.clear_button.setGeometry(QtCore.QRect(1030, 440, 331, 51))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(20)
-                self.clear_button.setFont(font)
+                self.clear_button.setGeometry(r(1030, 460, 331, 56))
+                self.clear_button.setFont(font_arial(20))
                 self.clear_button.setStyleSheet("background-color: rgba(245, 245, 245, 51);\n"
         "color: rgb(200, 200, 200);")
                 self.clear_button.setObjectName("clear_button")
-                
-                #Img
+
+                #Img — left panel, full height; content centered via AlignCenter + aspect-ratio scaling
                 self.img = QtWidgets.QLabel(self.centralwidget)
-                self.img.setGeometry(QtCore.QRect(0, -30, 941, 901))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(24)
-                self.img.setFont(font)
-                self.img.setStyleSheet("color: rgb(0, 0, 0);")
+                self.img.setGeometry(QtCore.QRect(0, 0, int(941 * sw), SH))
+                self.img.setFont(font_arial(24))
+                self.img.setStyleSheet("color: rgb(200, 200, 200);")
                 self.img.setAlignment(QtCore.Qt.AlignCenter)
                 self.img.setObjectName("img")
-                
-                #Logo
+
+                #Logo — scaled proportionally with screen, aspect ratio preserved
                 self.logo = QtWidgets.QLabel(self.centralwidget)
-                self.logo.setGeometry(QtCore.QRect(1070, 50, 241, 241))
-                self.logo.setText("")
                 logo_path = os.path.join(os.path.dirname(__file__), 'src', 'logo', 'Logo.png')
-                self.logo.setPixmap(QtGui.QPixmap(logo_path))
-                self.logo.setScaledContents(True)
+                logo_pixmap = QtGui.QPixmap(logo_path)
+                logo_target = int(241 * sf)
+                logo_pixmap = logo_pixmap.scaled(logo_target, logo_target,
+                                                  QtCore.Qt.KeepAspectRatio,
+                                                  QtCore.Qt.SmoothTransformation)
+                logo_w, logo_h = logo_pixmap.width(), logo_pixmap.height()
+                right_panel_x = int(941 * sw)
+                logo_x = right_panel_x + (SW - right_panel_x - logo_w) // 2
+                self.logo.setGeometry(QtCore.QRect(logo_x, int(40 * sh), logo_w, logo_h))
+                self.logo.setText("")
+                self.logo.setPixmap(logo_pixmap)
+                self.logo.setScaledContents(False)
                 self.logo.setObjectName("logo")
-                
-                #ROL
+
+                # ── Control rows ────────────────────────────────────────────────
+                # Layout per group (base coords, 1440×872):
+                #   Row A  y=ROW_A   [Checkbox  x=960 w=210 h=38]
+                #   Row B  y=ROW_B   [Cutoff label x=960 w=135 h=42]
+                #                    [Input        x=1100 w=90 h=42]
+                #                    [Result       x=1195 w=225 h=42]  ← same row
+                # ────────────────────────────────────────────────────────────────
+                ROW1A, ROW1B = 545, 598
+                ROW2A, ROW2B = 658, 711
+                ROW3A, ROW3B = 771, 824
+
+                CB_X, CB_W, CB_H     = 960, 210, 38
+                LBL_X, LBL_W        = 960, 135
+                INP_X, INP_W, ROW_H = 1100, 90, 42
+                RES_X, RES_W, RES_H = 1195, 225, 52
+
+                #Inspire checkbox
+                self.Inspiration_checkBox = QtWidgets.QCheckBox(self.centralwidget)
+                self.Inspiration_checkBox.setGeometry(r(CB_X, ROW1A, CB_W, CB_H))
+                self.Inspiration_checkBox.setFont(font_arial(17, bold=True))
+                self.Inspiration_checkBox.setChecked(True)
+                self.Inspiration_checkBox.setStyleSheet("color: rgb(200, 200, 200)")
+                self.Inspiration_checkBox.setObjectName("Inspiration_checkBox")
+
+                self.ROL_label = QtWidgets.QLabel(self.centralwidget)
+                self.ROL_label.setGeometry(r(LBL_X, ROW1B, LBL_W, ROW_H))
+                self.ROL_label.setFont(font_arial(16))
+                self.ROL_label.setStyleSheet("color: rgb(200, 200, 200)")
+                self.ROL_label.setObjectName("ROL_label")
+
+                self.cutoff_rol = QtWidgets.QLineEdit(self.centralwidget)
+                self.cutoff_rol.setGeometry(r(INP_X, ROW1B, INP_W, ROW_H))
+                self.cutoff_rol.setFont(font_arial(16))
+                self.cutoff_rol.setStyleSheet("color: rgb(200, 200, 200)")
+                self.cutoff_rol.setAlignment(QtCore.Qt.AlignCenter)
+                self.cutoff_rol.setObjectName("cutoff_rol")
+
                 self.ROL = QtWidgets.QLabel(self.centralwidget)
-                self.ROL.setGeometry(QtCore.QRect(1185, 525, 226, 65))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                self.ROL.setFont(font)
+                self.ROL.setGeometry(r(RES_X, ROW1B - 5, RES_W, RES_H))
+                self.ROL.setFont(font_arial(14))
                 self.ROL.setFocusPolicy(QtCore.Qt.NoFocus)
                 self.ROL.setStyleSheet("color: rgb(0, 0, 0);")
                 self.ROL.setText("")
                 self.ROL.setScaledContents(False)
-                self.ROL.setAlignment(QtCore.Qt.AlignCenter)
+                self.ROL.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
                 self.ROL.setObjectName("ROL")
-                
-                #ROL Cutoff
-                self.cutoff_rol = QtWidgets.QLineEdit(self.centralwidget)
-                self.cutoff_rol.setGeometry(QtCore.QRect(1090, 565, 91, 35))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                self.cutoff_rol.setFont(font)
-                self.cutoff_rol.setStyleSheet("color: rgb(200, 200, 200)")
-                self.cutoff_rol.setAlignment(QtCore.Qt.AlignCenter)
-                self.cutoff_rol.setObjectName("cutoff_rol")
-                
-                #ROL label
-                self.ROL_label = QtWidgets.QLabel(self.centralwidget)
-                self.ROL_label.setGeometry(QtCore.QRect(975, 565, 116, 35))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                font.setBold(False)
-                font.setWeight(50)
-                self.ROL_label.setFont(font)
-                self.ROL_label.setStyleSheet("color: rgb(200, 200, 200)")
-                self.ROL_label.setObjectName("ROL_label")
-                
-                #Lt label
+
+                #Lt checkbox
+                self.Lt_checkBox = QtWidgets.QCheckBox(self.centralwidget)
+                self.Lt_checkBox.setGeometry(r(CB_X, ROW2A, CB_W, CB_H))
+                self.Lt_checkBox.setFont(font_arial(17, bold=True))
+                self.Lt_checkBox.setChecked(True)
+                self.Lt_checkBox.setStyleSheet("color: rgb(200, 200, 200)")
+                self.Lt_checkBox.setObjectName("Lt_checkBox")
+
                 self.Lt_Label = QtWidgets.QLabel(self.centralwidget)
-                self.Lt_Label.setGeometry(QtCore.QRect(975, 648, 126, 35))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                font.setBold(False)
-                font.setWeight(50)
-                self.Lt_Label.setFont(font)
+                self.Lt_Label.setGeometry(r(LBL_X, ROW2B, LBL_W, ROW_H))
+                self.Lt_Label.setFont(font_arial(16))
                 self.Lt_Label.setStyleSheet("color: rgb(200, 200, 200)")
                 self.Lt_Label.setObjectName("Lt_Label")
-                
-                #Lt Alpha Cutoff
+
                 self.cutoff_LtAlpha = QtWidgets.QLineEdit(self.centralwidget)
-                self.cutoff_LtAlpha.setGeometry(QtCore.QRect(1110, 648, 71, 35))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                self.cutoff_LtAlpha.setFont(font)
+                self.cutoff_LtAlpha.setGeometry(r(INP_X, ROW2B, INP_W, ROW_H))
+                self.cutoff_LtAlpha.setFont(font_arial(16))
                 self.cutoff_LtAlpha.setStyleSheet("color: rgb(200, 200, 200)")
                 self.cutoff_LtAlpha.setAlignment(QtCore.Qt.AlignCenter)
                 self.cutoff_LtAlpha.setObjectName("cutoff_LtAlpha")
-                
-                #Lt Alpha
+
                 self.Lt_Alpha = QtWidgets.QLabel(self.centralwidget)
-                self.Lt_Alpha.setGeometry(QtCore.QRect(1185, 615, 226, 65))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                self.Lt_Alpha.setFont(font)
+                self.Lt_Alpha.setGeometry(r(RES_X, ROW2B - 5, RES_W, RES_H))
+                self.Lt_Alpha.setFont(font_arial(14))
                 self.Lt_Alpha.setFocusPolicy(QtCore.Qt.NoFocus)
                 self.Lt_Alpha.setStyleSheet("color: rgb(0, 0, 0);")
                 self.Lt_Alpha.setText("")
                 self.Lt_Alpha.setScaledContents(False)
-                self.Lt_Alpha.setAlignment(QtCore.Qt.AlignCenter)
+                self.Lt_Alpha.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
                 self.Lt_Alpha.setObjectName("Lt_Alpha")
-                
-                #Rt Alpha
+
+                #Rt checkbox
+                self.Rt_checkBox = QtWidgets.QCheckBox(self.centralwidget)
+                self.Rt_checkBox.setGeometry(r(CB_X, ROW3A, CB_W, CB_H))
+                self.Rt_checkBox.setFont(font_arial(17, bold=True))
+                self.Rt_checkBox.setChecked(True)
+                self.Rt_checkBox.setStyleSheet("color: rgb(200, 200, 200)")
+                self.Rt_checkBox.setObjectName("Rt_checkBox")
+
+                self.Rt_label = QtWidgets.QLabel(self.centralwidget)
+                self.Rt_label.setGeometry(r(LBL_X, ROW3B, LBL_W, ROW_H))
+                self.Rt_label.setFont(font_arial(16))
+                self.Rt_label.setStyleSheet("color: rgb(200, 200, 200)")
+                self.Rt_label.setObjectName("Rt_label")
+
+                self.cutoff_RtAlpha = QtWidgets.QLineEdit(self.centralwidget)
+                self.cutoff_RtAlpha.setGeometry(r(INP_X, ROW3B, INP_W, ROW_H))
+                self.cutoff_RtAlpha.setFont(font_arial(16))
+                self.cutoff_RtAlpha.setStyleSheet("color: rgb(200, 200, 200)")
+                self.cutoff_RtAlpha.setAlignment(QtCore.Qt.AlignCenter)
+                self.cutoff_RtAlpha.setObjectName("cutoff_RtAlpha")
+
                 self.Rt_Alpha = QtWidgets.QLabel(self.centralwidget)
-                self.Rt_Alpha.setGeometry(QtCore.QRect(1185, 698, 226, 65))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                self.Rt_Alpha.setFont(font)
+                self.Rt_Alpha.setGeometry(r(RES_X, ROW3B - 5, RES_W, RES_H))
+                self.Rt_Alpha.setFont(font_arial(14))
                 self.Rt_Alpha.setFocusPolicy(QtCore.Qt.NoFocus)
                 self.Rt_Alpha.setStyleSheet("color: rgb(0, 0, 0);")
                 self.Rt_Alpha.setText("")
                 self.Rt_Alpha.setScaledContents(False)
-                self.Rt_Alpha.setAlignment(QtCore.Qt.AlignCenter)
+                self.Rt_Alpha.setAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignLeft)
                 self.Rt_Alpha.setObjectName("Rt_Alpha")
-                
-                #Rt label
-                self.Rt_label = QtWidgets.QLabel(self.centralwidget)
-                self.Rt_label.setGeometry(QtCore.QRect(975, 730, 126, 35))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                font.setBold(False)
-                font.setWeight(50)
-                self.Rt_label.setFont(font)
-                self.Rt_label.setStyleSheet("color: rgb(200, 200, 200)")
-                self.Rt_label.setObjectName("Rt_label")
-                
-                #Rt Alpha cutoff
-                self.cutoff_RtAlpha = QtWidgets.QLineEdit(self.centralwidget)
-                self.cutoff_RtAlpha.setGeometry(QtCore.QRect(1110, 730, 71, 35))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(14)
-                self.cutoff_RtAlpha.setFont(font)
-                self.cutoff_RtAlpha.setStyleSheet("color: rgb(200, 200, 200)")
-                self.cutoff_RtAlpha.setAlignment(QtCore.Qt.AlignCenter)
-                self.cutoff_RtAlpha.setObjectName("cutoff_RtAlpha")
-                
-                #Inspire checkbox
-                self.Inspiration_checkBox = QtWidgets.QCheckBox(self.centralwidget)
-                self.Inspiration_checkBox.setGeometry(QtCore.QRect(970, 530, 200, 32))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(16)
-                font.setBold(True)
-                font.setWeight(75)
-                self.Inspiration_checkBox.setFont(font)
-                self.Inspiration_checkBox.setChecked(True)
-                self.Inspiration_checkBox.setStyleSheet("color: rgb(200, 200, 200)")
-                self.Inspiration_checkBox.setObjectName("Inspiration_checkBox")
-                
-                #Lt checkbox
-                self.Lt_checkBox = QtWidgets.QCheckBox(self.centralwidget)
-                self.Lt_checkBox.setGeometry(QtCore.QRect(970, 618, 200, 32))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(16)
-                font.setBold(True)
-                font.setWeight(75)
-                self.Lt_checkBox.setFont(font)
-                self.Lt_checkBox.setChecked(True)
-                self.Lt_checkBox.setStyleSheet("color: rgb(200, 200, 200)")
-                self.Lt_checkBox.setObjectName("Lt_checkBox")
-                
-                #Rt checkbox
-                self.Rt_checkBox = QtWidgets.QCheckBox(self.centralwidget)
-                self.Rt_checkBox.setGeometry(QtCore.QRect(970, 698, 200, 32))
-                font = QtGui.QFont()
-                font.setFamily("Arial")
-                font.setPointSize(16)
-                font.setBold(True)
-                font.setWeight(75)
-                self.Rt_checkBox.setFont(font)
-                self.Rt_checkBox.setChecked(True)
-                self.Rt_checkBox.setStyleSheet("color: rgb(200, 200, 200)")
-                self.Rt_checkBox.setObjectName("Rt_checkBox")
-                
+
                 MainWindow.setCentralWidget(self.centralwidget)
                 self.menubar = QtWidgets.QMenuBar(MainWindow)
-                self.menubar.setGeometry(QtCore.QRect(0, 0, 1440, 24))
+                self.menubar.setGeometry(r(0, 0, 1440, 24))
                 self.menubar.setObjectName("menubar")
                 MainWindow.setMenuBar(self.menubar)
                 self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -382,12 +360,9 @@ class Ui_MainWindow(object):
                         plt.axis("off")
                         plt.savefig('result/dcm.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/dcm.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/dcm.png')
                 else:
-                        pixmap = QPixmap(self.imagePath)
-                        self.img.setPixmap(pixmap)
-                        self.img.setScaledContents(True)
+                        self._show_pixmap(QPixmap(self.imagePath))
 
         def clear(self):
                 self.img.setText("Please select image")
@@ -498,8 +473,7 @@ class Ui_MainWindow(object):
                         #plt.legend()
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                 elif inspire_check_status == False and lt_check_status == True and rt_check_status == True:
                         plt.imshow(image)
                         plt.axis('off')
@@ -521,8 +495,7 @@ class Ui_MainWindow(object):
                         #plt.legend()
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 elif inspire_check_status == False and lt_check_status == False and rt_check_status == True:
                         plt.imshow(image)
@@ -538,8 +511,7 @@ class Ui_MainWindow(object):
                         #plt.legend()
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 elif inspire_check_status == False and lt_check_status == True and rt_check_status == False:
                         plt.imshow(image)
@@ -555,8 +527,7 @@ class Ui_MainWindow(object):
                         #plt.legend()
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 elif inspire_check_status == True and lt_check_status == False and rt_check_status == True:
                         plt.imshow(overlay)
@@ -573,8 +544,7 @@ class Ui_MainWindow(object):
                         #plt.legend()
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 elif inspire_check_status == True and lt_check_status == True and rt_check_status == False:
                         plt.imshow(overlay)
@@ -590,24 +560,21 @@ class Ui_MainWindow(object):
                         #plt.legend()
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 elif inspire_check_status == True and lt_check_status == False and rt_check_status == False:
                         plt.imshow(self.overlay)
                         plt.axis('off')        
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 else:
                         plt.imshow(image)
                         plt.axis('off')
                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                         #Show
-                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                        self.img.setScaledContents(True) 
+                        self._show_pixmap('result/result.png')
                         
                 #Calculate IoU
                 union = np.count_nonzero(r_l_y_pred_argmax == 2) + np.count_nonzero(r_l_y_pred_argmax == 3)
@@ -684,8 +651,7 @@ class Ui_MainWindow(object):
                                         #plt.legend()
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                 elif inspire_check_status == False and lt_check_status == True and rt_check_status == True:
                                         plt.imshow(self.image)
                                         plt.axis('off')
@@ -707,8 +673,7 @@ class Ui_MainWindow(object):
                                         #plt.legend()
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                         
                                 elif inspire_check_status == False and lt_check_status == False and rt_check_status == True:
                                         plt.imshow(self.image)
@@ -725,8 +690,7 @@ class Ui_MainWindow(object):
                                         #plt.legend()
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                         
                                 elif inspire_check_status == False and lt_check_status == True and rt_check_status == False:
                                         plt.imshow(self.image)
@@ -742,8 +706,7 @@ class Ui_MainWindow(object):
                                         #plt.legend()
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                         
                                 elif inspire_check_status == True and lt_check_status == False and rt_check_status == True:
                                         plt.imshow(self.overlay)
@@ -760,8 +723,7 @@ class Ui_MainWindow(object):
                                         #plt.legend()
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                         
                                 elif inspire_check_status == True and lt_check_status == True and rt_check_status == False:
                                         plt.imshow(self.overlay)
@@ -777,24 +739,21 @@ class Ui_MainWindow(object):
                                         #plt.legend()
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                 
                                 elif inspire_check_status == True and lt_check_status == False and rt_check_status == False:
                                         plt.imshow(self.overlay)
                                         plt.axis('off')
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                                         
                                 else:
                                         plt.imshow(self.image)
                                         plt.axis('off')
                                         plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                         #Show
-                                        self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                        self.img.setScaledContents(True) 
+                                        self._show_pixmap('result/result.png')
                         
                         except:
                                 self.img.setText("Please choose image")
@@ -805,19 +764,26 @@ class Ui_MainWindow(object):
                                 plt.axis('off')
                                 plt.savefig('result/result.png', bbox_inches='tight', facecolor='black')
                                 #Show
-                                self.img.setPixmap(QtGui.QPixmap('result/result.png'))
-                                self.img.setScaledContents(True) 
+                                self._show_pixmap('result/result.png') 
                         except:
                                 self.img.setText("Please choose image")
-                
-                
-                        
+
+        def _show_pixmap(self, source):
+                if isinstance(source, str):
+                        pix = QtGui.QPixmap(source)
+                else:
+                        pix = source
+                pix = pix.scaled(self.img.width(), self.img.height(),
+                                  QtCore.Qt.KeepAspectRatio,
+                                  QtCore.Qt.SmoothTransformation)
+                self.img.setScaledContents(False)
+                self.img.setPixmap(pix)
+
 if __name__ == "__main__":
         import sys
         app = QtWidgets.QApplication(sys.argv)
         MainWindow = QtWidgets.QMainWindow()
         ui = Ui_MainWindow()
         ui.setupUi(MainWindow)
-        #MainWindow.showFullScreen()
-        MainWindow.show()
+        MainWindow.showFullScreen()
         sys.exit(app.exec_())
