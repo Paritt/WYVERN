@@ -29,12 +29,8 @@ class Ui_MainWindow(object):
                 #Select button
                 self.select_button = QtWidgets.QPushButton(self.centralwidget)
                 self.select_button.setGeometry(QtCore.QRect(1030, 320, 331, 51))
-                font_dir = os.path.join(os.path.dirname(__file__), 'fonts')
-                font_path = os.path.join(font_dir, 'DBLimX.ttf')
-                if os.path.exists(font_path):
-                        QtGui.QFontDatabase.addApplicationFont(font_path)
-                font = QtGui.QFont("DB Lim X")
-                font.setPointSize(24)
+                font = QtGui.QFont("Arial")
+                font.setPointSize(20)
                 self.select_button.setFont(font)
                 self.select_button.setStyleSheet("color: rgb(200, 200, 200);\n"
         "background-color: rgba(245, 245, 245, 51);")
@@ -42,8 +38,8 @@ class Ui_MainWindow(object):
                 self.analyze_button = QtWidgets.QPushButton(self.centralwidget)
                 self.analyze_button.setGeometry(QtCore.QRect(1030, 380, 331, 51))
                 font = QtGui.QFont()
-                font.setFamily("DB Lim X")
-                font.setPointSize(24)
+                font.setFamily("Arial")
+                font.setPointSize(20)
                 
                 #Analyze button
                 self.analyze_button.setFont(font)
@@ -55,8 +51,8 @@ class Ui_MainWindow(object):
                 self.clear_button = QtWidgets.QPushButton(self.centralwidget)
                 self.clear_button.setGeometry(QtCore.QRect(1030, 440, 331, 51))
                 font = QtGui.QFont()
-                font.setFamily("DB Lim X")
-                font.setPointSize(24)
+                font.setFamily("Arial")
+                font.setPointSize(20)
                 self.clear_button.setFont(font)
                 self.clear_button.setStyleSheet("background-color: rgba(245, 245, 245, 51);\n"
         "color: rgb(200, 200, 200);")
@@ -66,8 +62,8 @@ class Ui_MainWindow(object):
                 self.img = QtWidgets.QLabel(self.centralwidget)
                 self.img.setGeometry(QtCore.QRect(0, -30, 941, 901))
                 font = QtGui.QFont()
-                font.setFamily("DB Lim X")
-                font.setPointSize(28)
+                font.setFamily("Arial")
+                font.setPointSize(24)
                 self.img.setFont(font)
                 self.img.setStyleSheet("color: rgb(0, 0, 0);")
                 self.img.setAlignment(QtCore.Qt.AlignCenter)
@@ -84,10 +80,10 @@ class Ui_MainWindow(object):
                 
                 #ROL
                 self.ROL = QtWidgets.QLabel(self.centralwidget)
-                self.ROL.setGeometry(QtCore.QRect(1190, 530, 211, 61))
+                self.ROL.setGeometry(QtCore.QRect(1185, 525, 226, 65))
                 font = QtGui.QFont()
-                font.setFamily("DB Lim X")
-                font.setPointSize(19)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 self.ROL.setFont(font)
                 self.ROL.setFocusPolicy(QtCore.Qt.NoFocus)
                 self.ROL.setStyleSheet("color: rgb(0, 0, 0);")
@@ -98,9 +94,10 @@ class Ui_MainWindow(object):
                 
                 #ROL Cutoff
                 self.cutoff_rol = QtWidgets.QLineEdit(self.centralwidget)
-                self.cutoff_rol.setGeometry(QtCore.QRect(1090, 560, 91, 41))
+                self.cutoff_rol.setGeometry(QtCore.QRect(1090, 565, 91, 35))
                 font = QtGui.QFont()
-                font.setPointSize(18)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 self.cutoff_rol.setFont(font)
                 self.cutoff_rol.setStyleSheet("color: rgb(200, 200, 200)")
                 self.cutoff_rol.setAlignment(QtCore.Qt.AlignCenter)
@@ -108,9 +105,10 @@ class Ui_MainWindow(object):
                 
                 #ROL label
                 self.ROL_label = QtWidgets.QLabel(self.centralwidget)
-                self.ROL_label.setGeometry(QtCore.QRect(990, 560, 101, 41))
+                self.ROL_label.setGeometry(QtCore.QRect(975, 565, 116, 35))
                 font = QtGui.QFont()
-                font.setPointSize(18)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 font.setBold(False)
                 font.setWeight(50)
                 self.ROL_label.setFont(font)
@@ -119,9 +117,10 @@ class Ui_MainWindow(object):
                 
                 #Lt label
                 self.Lt_Label = QtWidgets.QLabel(self.centralwidget)
-                self.Lt_Label.setGeometry(QtCore.QRect(990, 640, 111, 41))
+                self.Lt_Label.setGeometry(QtCore.QRect(975, 648, 126, 35))
                 font = QtGui.QFont()
-                font.setPointSize(18)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 font.setBold(False)
                 font.setWeight(50)
                 self.Lt_Label.setFont(font)
@@ -130,9 +129,10 @@ class Ui_MainWindow(object):
                 
                 #Lt Alpha Cutoff
                 self.cutoff_LtAlpha = QtWidgets.QLineEdit(self.centralwidget)
-                self.cutoff_LtAlpha.setGeometry(QtCore.QRect(1110, 640, 71, 41))
+                self.cutoff_LtAlpha.setGeometry(QtCore.QRect(1110, 648, 71, 35))
                 font = QtGui.QFont()
-                font.setPointSize(18)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 self.cutoff_LtAlpha.setFont(font)
                 self.cutoff_LtAlpha.setStyleSheet("color: rgb(200, 200, 200)")
                 self.cutoff_LtAlpha.setAlignment(QtCore.Qt.AlignCenter)
@@ -140,10 +140,10 @@ class Ui_MainWindow(object):
                 
                 #Lt Alpha
                 self.Lt_Alpha = QtWidgets.QLabel(self.centralwidget)
-                self.Lt_Alpha.setGeometry(QtCore.QRect(1190, 620, 211, 61))
+                self.Lt_Alpha.setGeometry(QtCore.QRect(1185, 615, 226, 65))
                 font = QtGui.QFont()
-                font.setFamily("DB Lim X")
-                font.setPointSize(19)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 self.Lt_Alpha.setFont(font)
                 self.Lt_Alpha.setFocusPolicy(QtCore.Qt.NoFocus)
                 self.Lt_Alpha.setStyleSheet("color: rgb(0, 0, 0);")
@@ -154,10 +154,10 @@ class Ui_MainWindow(object):
                 
                 #Rt Alpha
                 self.Rt_Alpha = QtWidgets.QLabel(self.centralwidget)
-                self.Rt_Alpha.setGeometry(QtCore.QRect(1200, 700, 201, 61))
+                self.Rt_Alpha.setGeometry(QtCore.QRect(1185, 698, 226, 65))
                 font = QtGui.QFont()
-                font.setFamily("DB Lim X")
-                font.setPointSize(19)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 self.Rt_Alpha.setFont(font)
                 self.Rt_Alpha.setFocusPolicy(QtCore.Qt.NoFocus)
                 self.Rt_Alpha.setStyleSheet("color: rgb(0, 0, 0);")
@@ -168,9 +168,10 @@ class Ui_MainWindow(object):
                 
                 #Rt label
                 self.Rt_label = QtWidgets.QLabel(self.centralwidget)
-                self.Rt_label.setGeometry(QtCore.QRect(990, 720, 111, 41))
+                self.Rt_label.setGeometry(QtCore.QRect(975, 730, 126, 35))
                 font = QtGui.QFont()
-                font.setPointSize(18)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 font.setBold(False)
                 font.setWeight(50)
                 self.Rt_label.setFont(font)
@@ -179,9 +180,10 @@ class Ui_MainWindow(object):
                 
                 #Rt Alpha cutoff
                 self.cutoff_RtAlpha = QtWidgets.QLineEdit(self.centralwidget)
-                self.cutoff_RtAlpha.setGeometry(QtCore.QRect(1110, 720, 71, 41))
+                self.cutoff_RtAlpha.setGeometry(QtCore.QRect(1110, 730, 71, 35))
                 font = QtGui.QFont()
-                font.setPointSize(18)
+                font.setFamily("Arial")
+                font.setPointSize(14)
                 self.cutoff_RtAlpha.setFont(font)
                 self.cutoff_RtAlpha.setStyleSheet("color: rgb(200, 200, 200)")
                 self.cutoff_RtAlpha.setAlignment(QtCore.Qt.AlignCenter)
@@ -189,9 +191,10 @@ class Ui_MainWindow(object):
                 
                 #Inspire checkbox
                 self.Inspiration_checkBox = QtWidgets.QCheckBox(self.centralwidget)
-                self.Inspiration_checkBox.setGeometry(QtCore.QRect(970, 530, 141, 20))
+                self.Inspiration_checkBox.setGeometry(QtCore.QRect(970, 530, 200, 32))
                 font = QtGui.QFont()
-                font.setPointSize(20)
+                font.setFamily("Arial")
+                font.setPointSize(16)
                 font.setBold(True)
                 font.setWeight(75)
                 self.Inspiration_checkBox.setFont(font)
@@ -201,9 +204,10 @@ class Ui_MainWindow(object):
                 
                 #Lt checkbox
                 self.Lt_checkBox = QtWidgets.QCheckBox(self.centralwidget)
-                self.Lt_checkBox.setGeometry(QtCore.QRect(970, 620, 141, 20))
+                self.Lt_checkBox.setGeometry(QtCore.QRect(970, 618, 200, 32))
                 font = QtGui.QFont()
-                font.setPointSize(20)
+                font.setFamily("Arial")
+                font.setPointSize(16)
                 font.setBold(True)
                 font.setWeight(75)
                 self.Lt_checkBox.setFont(font)
@@ -213,9 +217,10 @@ class Ui_MainWindow(object):
                 
                 #Rt checkbox
                 self.Rt_checkBox = QtWidgets.QCheckBox(self.centralwidget)
-                self.Rt_checkBox.setGeometry(QtCore.QRect(970, 700, 141, 20))
+                self.Rt_checkBox.setGeometry(QtCore.QRect(970, 698, 200, 32))
                 font = QtGui.QFont()
-                font.setPointSize(20)
+                font.setFamily("Arial")
+                font.setPointSize(16)
                 font.setBold(True)
                 font.setWeight(75)
                 self.Rt_checkBox.setFont(font)
